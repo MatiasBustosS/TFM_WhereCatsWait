@@ -1,0 +1,73 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &5600030031645965259
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 16804696bae916e469f69bd09cb10f1f, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 17.208872
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 16804696bae916e469f69bd09cb10f1f, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -10.614524
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 16804696bae916e469f69bd09cb10f1f, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -18.1284
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 16804696bae916e469f69bd09cb10f1f, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.70715374
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 16804696bae916e469f69bd09cb10f1f, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 16804696bae916e469f69bd09cb10f1f, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.7070599
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 16804696bae916e469f69bd09cb10f1f, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 16804696bae916e469f69bd09cb10f1f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 16804696bae916e469f69bd09cb10f1f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -89.992
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 16804696bae916e469f69bd09cb10f1f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 16804696bae916e469f69bd09cb10f1f, type: 3}
+      propertyPath: m_Name
+      value: Modular_Japanese_Stairs_Kit_vfzvebidw_High
+      objectReference: {fileID: 0}
+    - target: {fileID: 3957120072285614842, guid: 16804696bae916e469f69bd09cb10f1f, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 88e13da26215ec34c9aacab05b8b27fc, type: 2}
+    - target: {fileID: 6164457802149354199, guid: 16804696bae916e469f69bd09cb10f1f, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 88e13da26215ec34c9aacab05b8b27fc, type: 2}
+    m_RemovedComponents: []
+    m_RemovedGameObjects:
+    - {fileID: -6217635098101982343, guid: 16804696bae916e469f69bd09cb10f1f, type: 3}
+    - {fileID: -5161972456604593976, guid: 16804696bae916e469f69bd09cb10f1f, type: 3}
+    - {fileID: 9041105844741041501, guid: 16804696bae916e469f69bd09cb10f1f, type: 3}
+    - {fileID: -9145997399539450710, guid: 16804696bae916e469f69bd09cb10f1f, type: 3}
+    - {fileID: -3508879931004483360, guid: 16804696bae916e469f69bd09cb10f1f, type: 3}
+    - {fileID: -3841547941815400634, guid: 16804696bae916e469f69bd09cb10f1f, type: 3}
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 16804696bae916e469f69bd09cb10f1f, type: 3}
