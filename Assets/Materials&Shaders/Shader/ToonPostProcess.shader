@@ -4,7 +4,7 @@ Shader "Custom/ToonPostProcess"
     {
         _MainTex ("Source", 2D) = "white" {}
         _ColorLevels ("Color Quantization Levels", Range(2, 128)) = 5
-        _EdgeThreshold ("Edge Threshold", Range(0.001, 0.1)) = 0.01
+        _EdgeThreshold ("Edge Threshold", Range(0.0001, 0.01)) = 0.01
         _EdgeColor ("Edge Color", Color) = (0, 0, 0, 1)
     }
 
