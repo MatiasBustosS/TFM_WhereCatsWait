@@ -10,4 +10,9 @@ public class ShaderPosition : MonoBehaviour
         Shader.SetGlobalVector("_Position", transform.position);
         Shader.SetGlobalFloat("_Radius", radius);
     }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawWireSphere(transform.position, radius);
+    }
 }

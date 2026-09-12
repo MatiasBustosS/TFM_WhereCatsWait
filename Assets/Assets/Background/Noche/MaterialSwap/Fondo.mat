@@ -7,18 +7,20 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Tori
-  m_Shader: {fileID: -6465566751694194690, guid: f6f65a4200a753d42889a4dbbb7b17e3, type: 3}
+  m_Name: Fondo
+  m_Shader: {fileID: -6465566751694194690, guid: 2b9821da5ba4b7e47af65ed917931fd2, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
+  - _ALPHATEST_ON
   - _STYLE_SWAPTEXTURE
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: 2450
-  stringTagMap: {}
+  stringTagMap:
+    RenderType: TransparentCutout
   disabledShaderPasses:
   - MOTIONVECTORS
   m_LockedProperties: 
@@ -54,7 +56,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTexture:
-        m_Texture: {fileID: 2800000, guid: abeb826b0bdb2d0478d4d0d516e51d0d, type: 3}
+        m_Texture: {fileID: 2800000, guid: 1f71a971639681f4cb40ba05ae605e91, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -82,7 +84,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SecundaryTexture:
-        m_Texture: {fileID: 2800000, guid: 7532822f006d1c54ca87f01303b062b3, type: 3}
+        m_Texture: {fileID: 2800000, guid: 1dc92a1b453ee884c8bfdbdffeea7df5, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SpecGlossMap:
@@ -118,21 +120,21 @@ Material:
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _DstBlendAlpha: 0
-    - _EdgeWidth: 0.006
+    - _EdgeWidth: 0.043
     - _EnvironmentReflections: 1
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _Metallic: 0
-    - _MoveSpeed: 1.66
-    - _NoiseScale: 0.537
-    - _NoiseStrenght: 0.471
+    - _MoveSpeed: 2.27
+    - _NoiseScale: 0.437
+    - _NoiseStrenght: 0.368
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _RadiusNoiseCutoff: 0.059
-    - _RadiusNoiseOffset: 0.1
+    - _RadiusNoiseCutoff: 0.104
+    - _RadiusNoiseOffset: 0.161
     - _ReceiveShadows: 1
     - _STYLE: 0
     - _Smoothness: 0.5
@@ -149,7 +151,7 @@ Material:
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _EdgeColor: {r: 0.49486613, g: 1, b: 0, a: 1}
+    - _EdgeColor: {r: 1, g: 0.08203981, b: 0, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _Position: {r: 0, g: 0, b: 0, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
