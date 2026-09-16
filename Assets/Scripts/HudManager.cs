@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,10 +18,9 @@ public class HudManager : MonoBehaviour
     [SerializeField] private FlowBoard flowFreePuzzle;
     [SerializeField] private ManiaBoard pipeManiaPuzzle;
     
-    [Header("Others")]
-    [SerializeField] private GameObject win;
-    [SerializeField] private GameObject lose;
-    [SerializeField] private Animator fade;
+    
+    [Header("FadeController")]
+    [SerializeField] private FadeController fadeController;
 
     private bool isWin = false;
     private bool isLose = false; 
@@ -28,8 +28,10 @@ public class HudManager : MonoBehaviour
     public CircleBoard circleBoard => circlePuzzle;
     public FlowBoard flowBoard => flowFreePuzzle;
     public ManiaBoard pipeManiaBoard => pipeManiaPuzzle;
+    public FadeController _FadeController => fadeController;
     
     private PuzzleManager puzzleManager;
+    
     
     private bool isTarget = false;
     
@@ -50,14 +52,8 @@ public class HudManager : MonoBehaviour
     {
         if(isTarget) return;
         
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
-        
-        aim.gameObject.SetActive(false);
-        
         isTarget = true;
         
-        print(getType.ToString());
         switch (getType)
         {
             case PuzzleType.Slider:
@@ -72,9 +68,6 @@ public class HudManager : MonoBehaviour
             case PuzzleType.CirclePuzzle:
                 CirclePuzzle.gameObject.SetActive(true);
                 break;
-            
-            default:
-                break;
         }
     }
 
@@ -86,29 +79,29 @@ public class HudManager : MonoBehaviour
     public void ClosePuzzle()
     {
         isTarget = false;
-        aim.gameObject.SetActive(true);
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        
+        
+
+        StartCoroutine(Wait());
+
     }
 
-    public void Win()
+    private IEnumerator Wait()
     {
-        if(isLose) return;
-        isWin = true;
-        FadeOut();
-        win.SetActive(true);
-    }
-
-    public void Lose()
-    {
-        if(isWin)  return;
-        isLose = true;
-        FadeOut();
-        lose.SetActive(true);
-    }
-    
-    private void FadeOut()
-    {
-        fade.SetTrigger("FadeOut");
+        yield return new WaitForSeconds(1f);
+        
+        Slider.gameObject.SetActive(false);
+        PipeMania.gameObject.SetActive(false);
+        FlowFree.gameObject.SetActive(false);
+        CirclePuzzle.gameObject.SetActive(false);
+        fadeController.FadeIn();
+        
+        yield return new WaitForSeconds(0.3f);
+        
+        GameManager.instance.ActiveNpc.GetComponent<Animator>().SetTrigger("Victory");
+        
+        yield return new WaitForSeconds(2f);
+        
+        GameManager.instance.ChangeWorldState(true);
     }
 }

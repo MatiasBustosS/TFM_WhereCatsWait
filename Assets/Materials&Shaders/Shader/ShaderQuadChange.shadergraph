@@ -909,7 +909,7 @@
     "m_Title": "Movement",
     "m_Position": {
         "x": -2849.0,
-        "y": -33.00000762939453
+        "y": -33.000038146972659
     }
 }
 
@@ -938,11 +938,11 @@
     "m_Hidden": false,
     "m_PerRendererData": false,
     "m_customAttributes": [],
-    "m_Value": 0.0,
+    "m_Value": 0.0010000000474974514,
     "m_FloatType": 1,
     "m_LiteralFloatMode": false,
     "m_RangeValues": {
-        "x": 0.0,
+        "x": 0.0010000000474974514,
         "y": 1.0
     },
     "m_SliderType": 0,

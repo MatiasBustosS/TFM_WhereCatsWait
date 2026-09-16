@@ -71,8 +71,7 @@ public class RailPlayerMovement : MonoBehaviour
         jump.action.performed += OnJump;
         jump.action.canceled += OnJump;
 
-        interact.action.performed += OnInteract;
-        interact.action.canceled += OnInteract;
+        interact.action.started += OnInteract;
     }
 
     private void OnDisable()
@@ -137,21 +136,20 @@ public class RailPlayerMovement : MonoBehaviour
 
     public void OnInteract(InputAction.CallbackContext context)
     {
-        if (!canMove) return;
-        if (HudManager.Instance != null && HudManager.Instance.IsTarget) return;
-
-        animator?.SetTrigger("Interact");
-
-        if (_hit.collider != null && _hit.collider.CompareTag("Puzzle"))
+        
+        if (npc != null)
         {
-            var puzzleManager = _hit.collider.GetComponent<PuzzleManager>();
-            if (puzzleManager != null)
+            GameManager.instance.SetNpc(npc);
+            SetCanMove(false);
+            
+            if (GameManager.instance.IsTalking)
             {
-                if (puzzleManager.solved) return;
-
-                animator?.SetFloat("HSpeed", 0);
-                HudManager.Instance.OpenPuzzle(puzzleManager.puzzleType);
-                puzzleManager.Initialize();
+                GameManager.instance.DialogueManager.NextDialogue();
+            }
+            else
+            {
+                npc.Talk();
+                GameManager.instance.ChangeTalking(true);
             }
         }
     }
@@ -296,6 +294,13 @@ public class RailPlayerMovement : MonoBehaviour
         currentT = newT;
         _targetTransitionPos = currentRail.GetPositionAt(currentT);
         _isTransitioning = true;
+    }
+
+    private NPCDialogue npc;
+
+    public void SetNPC(NPCDialogue npc)
+    {
+        this.npc = npc;
     }
 
     public void SetCanMove(bool move)

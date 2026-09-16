@@ -34,7 +34,7 @@ public class PuzzleFlowFree : PuzzleManager
         }
 
         solved = true;
-        OpenDoor();
+        CompletePuzzle();
     }
     
 }

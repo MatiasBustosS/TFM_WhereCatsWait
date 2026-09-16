@@ -93,7 +93,7 @@ Material:
     - _FoamColor: {r: 1, g: 1, b: 1, a: 1}
     - _RippleColor: {r: 1, g: 1, b: 1, a: 1}
     - _SecondFoamColor: {r: 1, g: 1, b: 1, a: 1}
-    - _ShallowColor: {r: 0.3538487, g: 1, b: 0, a: 1}
+    - _ShallowColor: {r: 0.30015132, g: 0.5236907, b: 0.8962264, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &8936590992475540306

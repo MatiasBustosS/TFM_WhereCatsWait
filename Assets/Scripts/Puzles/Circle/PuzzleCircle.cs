@@ -41,6 +41,6 @@ public class PuzzleCircle : PuzzleManager
         if(!discC.IsAtIndex(solution.z)) return;
             
         solved = true;
-        OpenDoor();
+        CompletePuzzle();
     }
 }

@@ -16,7 +16,7 @@ public class EnergyOrbController : MonoBehaviour
 
     [Header("Referencias Visuales")]
     [SerializeField] private MeshRenderer orbMeshRenderer;
-    [SerializeField] private ParticleSystem orbParticles;
+    [SerializeField] private GameObject orbParticles;
 
     [Header("Configuración por Estado")]
     [Header("Estado 1: Vacío")]
@@ -36,9 +36,8 @@ public class EnergyOrbController : MonoBehaviour
     private OrbState _currentState = OrbState.Empty;
     private int _collectedCount = 0;
     private Material _orbMaterial;
-    private ParticleSystem.MainModule _particleMain;
 
-    private static readonly int ColorProperty = Shader.PropertyToID("_BaseColor");
+    private static readonly int ColorProperty = Shader.PropertyToID("_ShallowColor");
     private static readonly int EmissionColorProperty = Shader.PropertyToID("_EmissionColor");
 
     private void Awake()
@@ -46,11 +45,6 @@ public class EnergyOrbController : MonoBehaviour
         if (orbMeshRenderer != null)
         {
             _orbMaterial = orbMeshRenderer.material;
-        }
-
-        if (orbParticles != null)
-        {
-            _particleMain = orbParticles.main;
         }
 
         UpdateOrbVisuals();
@@ -61,6 +55,14 @@ public class EnergyOrbController : MonoBehaviour
     private void Start()
     {
         orbs = FindObjectsByType<EnergyCollectable>(FindObjectsSortMode.None);
+
+        foreach (EnergyCollectable orb in orbs)
+        {
+            orb.gameObject.SetActive(false);
+        }
+        
+        gameObject.SetActive(false);
+        
     }
 
     private void LateUpdate()
@@ -75,6 +77,13 @@ public class EnergyOrbController : MonoBehaviour
         transform.position = Vector3.Lerp(transform.position, targetPosition, followSpeed * Time.deltaTime);
     }
 
+    public void SetActiveOrbs()
+    {
+        foreach (EnergyCollectable orb in orbs)
+        {
+            orb.gameObject.SetActive(true);
+        }
+    }
 
     public void SetEmptyState()
     {
@@ -99,11 +108,12 @@ public class EnergyOrbController : MonoBehaviour
 
         UpdateOrbVisuals();
     }
-    
+
     private void SetMaxEnergyState()
     {
         _currentState = OrbState.MaxEnergy;
         UpdateOrbVisuals();
+        GameManager.instance.ActiveNpc.NextDialogue();
     }
 
 
@@ -117,19 +127,19 @@ public class EnergyOrbController : MonoBehaviour
             case OrbState.Empty:
                 targetColor = emptyColor;
                 targetScale = emptyScale;
-                SetParticleEmission(false);
+                orbParticles.SetActive(false);
                 break;
 
             case OrbState.Collecting:
                 targetColor = collectingColor;
                 targetScale = Mathf.Min(baseCollectingScale + (_collectedCount * scalePerEnergy), maxCollectingScale);
-                SetParticleEmission(true);
+                orbParticles.SetActive(false);
                 break;
 
             case OrbState.MaxEnergy:
                 targetColor = maxEnergyColor;
                 targetScale = maxEnergyScale;
-                SetParticleEmission(true);
+                orbParticles.SetActive(true);
                 break;
         }
 
@@ -146,17 +156,5 @@ public class EnergyOrbController : MonoBehaviour
                 _orbMaterial.SetColor(EmissionColorProperty, targetColor * intensity);
             }
         }
-
-        if (orbParticles != null)
-        {
-            _particleMain.startColor = targetColor;
-        }
-    }
-
-    private void SetParticleEmission(bool enabled)
-    {
-        if (orbParticles == null) return;
-        var emission = orbParticles.emission;
-        emission.enabled = enabled;
     }
 }

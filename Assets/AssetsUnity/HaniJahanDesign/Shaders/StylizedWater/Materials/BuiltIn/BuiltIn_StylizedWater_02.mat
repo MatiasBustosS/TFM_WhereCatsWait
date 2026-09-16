@@ -85,8 +85,8 @@ Material:
     - _SecondFoamSource: 0
     - _SecondFoamSpeed: 0.2
     - _TransparencyMultiplier: 1
-    - _WaveHeight: 0.3
-    - _WaveScale: 1.1
+    - _WaveHeight: 0.074
+    - _WaveScale: 0.01
     - _WaveSpeed: 1
     m_Colors:
     - _BaseColor: {r: 0, g: 0.35710096, b: 1, a: 1}
@@ -95,6 +95,7 @@ Material:
     - _SecondFoamColor: {r: 1, g: 1, b: 1, a: 1}
     - _ShallowColor: {r: 0, g: 0.86163044, b: 1, a: 1}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!114 &8936590992475540306
 MonoBehaviour:
   m_ObjectHideFlags: 11

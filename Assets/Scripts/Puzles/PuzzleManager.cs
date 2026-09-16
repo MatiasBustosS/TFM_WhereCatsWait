@@ -13,16 +13,13 @@ public enum PuzzleType
 
 public abstract class PuzzleManager : MonoBehaviour
 {
-    [SerializeField] private OpenDoor[] doorToOpen;
     public abstract PuzzleType puzzleType { get; }
     public abstract bool solved { get; set; }
     public abstract void Initialize();
     public abstract void CheckWin();
 
-    protected void OpenDoor()
+    protected void CompletePuzzle()
     {
-        if (doorToOpen == null)  return;
-        foreach (OpenDoor door in doorToOpen)
-            door.Open();
+        HudManager.Instance.ClosePuzzle();
     }
 }

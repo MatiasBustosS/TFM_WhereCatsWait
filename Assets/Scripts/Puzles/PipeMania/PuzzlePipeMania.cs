@@ -42,7 +42,7 @@ public class PuzzlePipeMania : PuzzleManager
         if (connected)
         {
             solved = true;
-            OpenDoor();
+            CompletePuzzle();
         }
     }
     bool Search(ManiaCell start, HashSet<ManiaCell> visited)
