@@ -54,8 +54,10 @@ public class EnergyOrbController : MonoBehaviour
 
     private void Start()
     {
-        orbs = FindObjectsByType<EnergyCollectable>(FindObjectsSortMode.None);
-
+        //orbs = FindObjectsByType<EnergyCollectable>(FindObjectsSortMode.None);
+        
+        orbs = FindObjectsByType<EnergyCollectable>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+        
         foreach (EnergyCollectable orb in orbs)
         {
             orb.gameObject.SetActive(false);

@@ -1,6 +1,7 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 [Serializable]
 public class Dialogue
@@ -18,8 +19,12 @@ public class Dialogue
 
 public class NPCDialogue : MonoBehaviour
 {
+    [Header("Settings")]
     [SerializeField] private GameObject PressE;
+    
+    [Header("NPC Data")]
     [SerializeField] private string characterName;
+    [SerializeField] private Sprite characterFace;
     [SerializeField] private AudioClip voice;
     
     [SerializeField] private Dialogue[] dialogues;
@@ -29,7 +34,7 @@ public class NPCDialogue : MonoBehaviour
 
     public void Talk()
     {
-        dialogueManager.StartDialogue(characterName, dialogues[actualDialogue], voice);
+        dialogueManager.StartDialogue(characterName, dialogues[actualDialogue], voice, characterFace);
     }
 
     public void NextDialogue()

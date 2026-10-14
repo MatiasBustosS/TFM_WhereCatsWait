@@ -12,6 +12,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private HudManager hudManager;
     [SerializeField] private RailPlayerMovement playerMovement;
     [SerializeField] private EnergyOrbController energyOrbController; 
+    
+    [Header("Victory")]
+    [SerializeField] private bool Victory;
 
     private NPCDialogue activeNpc;
     
@@ -30,6 +33,8 @@ public class GameManager : MonoBehaviour
     {
         if (instance == null) instance = this;
         else Destroy(gameObject);
+
+        if (Victory) StartCoroutine(BuildVictory());
     }
 
     private void Update()
@@ -49,8 +54,8 @@ public class GameManager : MonoBehaviour
 
     public void ChangeWorldState(bool state)
     {
-        ShaderSize = !ShaderSize;
-        if (ShaderSize) GetComponent<CameraMovement>().PlayCameraAnimation();
+        ShaderSize = state;
+        if (state) GetComponent<CameraMovement>().PlayCameraAnimation();
     }
 
     public void StartCollection()
@@ -62,5 +67,11 @@ public class GameManager : MonoBehaviour
     public void EndCollection()
     {
         energyOrbController.gameObject.SetActive(false);
+    }
+
+    private IEnumerator BuildVictory()
+    {
+        yield return new WaitForSeconds(3f);
+        ChangeWorldState(true);
     }
 }

@@ -202,7 +202,7 @@ public class RailPlayerMovement : MonoBehaviour
         }
 
         float targetSpeed = Mathf.Abs(inputX) > 0.1f ? 1f : 0f;
-        _animSpeed = Mathf.Lerp(_animSpeed, targetSpeed, 10f * Time.deltaTime);
+        _animSpeed = Mathf.MoveTowards(_animSpeed, targetSpeed, 10f * Time.deltaTime);
         animator?.SetFloat("HSpeed", _animSpeed);
 
         Vector3 candidatePos = currentRail.GetPositionAt(candidateT);

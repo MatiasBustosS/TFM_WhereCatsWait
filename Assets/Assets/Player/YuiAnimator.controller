@@ -162,7 +162,7 @@ AnimatorState:
   m_PrefabAsset: {fileID: 0}
   m_Name: Movement
   m_Speed: 1
-  m_CycleOffset: 0
+  m_CycleOffset: 1
   m_Transitions:
   - {fileID: 913451454694354292}
   - {fileID: -3603373845700575601}
@@ -177,7 +177,7 @@ AnimatorState:
   m_TimeParameterActive: 0
   m_Motion: {fileID: 432755585101594069}
   m_Tag: 
-  m_SpeedParameter: 
+  m_SpeedParameter: HSpeed
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 
@@ -294,7 +294,7 @@ BlendTree:
   m_BlendParameterY: Blend
   m_MinThreshold: 0
   m_MaxThreshold: 1
-  m_UseAutomaticThresholds: 1
+  m_UseAutomaticThresholds: 0
   m_NormalizedBlendValues: 0
   m_BlendType: 0
 --- !u!1101 &913451454694354292

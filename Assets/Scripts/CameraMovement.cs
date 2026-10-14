@@ -12,6 +12,8 @@ public class CameraMovement : MonoBehaviour
 
     private Vector3 originalOffset;
 
+    private bool isPlayingAnimation = false;
+    
     private void Start()
     {
         originalOffset = cinemachineFollow.FollowOffset;
@@ -19,11 +21,12 @@ public class CameraMovement : MonoBehaviour
 
     public void PlayCameraAnimation()
     {
-        StartCoroutine(CameraAnimation());
+        if( !isPlayingAnimation) StartCoroutine(CameraAnimation());
     }
 
     private IEnumerator CameraAnimation()
     {
+        isPlayingAnimation = true;
         yield return MoveCamera(originalOffset, targetOffset, duration);
 
         yield return new WaitForSeconds(waitTime);
@@ -31,6 +34,8 @@ public class CameraMovement : MonoBehaviour
         yield return MoveCamera(targetOffset, originalOffset, duration);
         
         GameManager.instance.RailPlayerMovement.SetCanMove(true);
+        
+        isPlayingAnimation = false;
     }
 
     private IEnumerator MoveCamera(Vector3 from, Vector3 to, float duration)

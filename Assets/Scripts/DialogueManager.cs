@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class DialogueManager : MonoBehaviour
 {
@@ -8,6 +9,7 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private GameObject dialoguePanel;
     [SerializeField] private TMP_Text characterName;
     [SerializeField] private TMP_Text dialogueText;
+    [SerializeField] private Image characterFace;
 
     [Header("Settings")]
     [SerializeField] private float typingSpeed = 0.03f;
@@ -34,13 +36,14 @@ public class DialogueManager : MonoBehaviour
 
     }
 
-    public void StartDialogue(string chName, Dialogue dialogue, AudioClip voice)
+    public void StartDialogue(string chName, Dialogue dialogue, AudioClip voice, Sprite npcSprite)
     {
         characterName.text = chName;
         currentDialogue = dialogue;
         currentIndex = 0;
         isDialogueActive = true;
         currentVoiceClip = voice;
+        characterFace.sprite = npcSprite;
         
         dialoguePanel.SetActive(true);
 
