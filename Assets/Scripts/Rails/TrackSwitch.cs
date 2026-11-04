@@ -36,13 +36,13 @@ public class TrackSwitch : MonoBehaviour
 
         if (requiredDirection == SwitchDirection.None)
         {
-            player.SwitchToRail(targetRail, targetRailT);
+            //player.SwitchToRail(targetRail, targetRailT);
             return;
         }
         
         if (IsInputValid(rawInput, requiredDirection))
         {
-            player.SwitchToRail(targetRail, targetRailT);
+            //player.SwitchToRail(targetRail, targetRailT);
         }
     }
     

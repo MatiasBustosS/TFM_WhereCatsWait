@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -11,20 +12,25 @@ public class RailPlayerMovement : MonoBehaviour
     [SerializeField] private InputActionReference jump;
     [SerializeField] private InputActionReference interact;
 
-    [Header("Riel Actual")]
-    [SerializeField] private TrackRail currentRail;
+    [Header("Riel (un solo contenedor con varias splines)")]
+    [SerializeField] private TrackRail rail;
+    [SerializeField] private int currentSpline = 0;
     [Range(0f, 1f)] [SerializeField] private float currentT = 0f;
 
     [Header("Movement Settings")]
     [SerializeField] private float moveSpeed = 5f;
-    [SerializeField] private float switchSpeed = 10f;
     [SerializeField] private float jumpForce = 10f;
     [SerializeField] private float gravity = -20f;
-    
+
+    [Header("Selección de rama")]
+    [Tooltip("Qué tan alineado debe estar el input con una rama (0-1) para poder tomarla.")]
+    [Range(0f, 1f)] [SerializeField] private float junctionInputThreshold = 0.5f;
+    [Tooltip("Bonus para seguir en la spline actual y evitar cambios accidentales.")]
+    [Range(0f, 0.5f)] [SerializeField] private float currentSplineBias = 0.1f;
+
     [Header("Colisión en el Riel")]
     [SerializeField] private LayerMask obstacleLayer;
     [SerializeField] private float obstacleCheckRadiusMultiplier = 0.95f;
-
 
     [Header("Visual & Interaction")]
     [SerializeField] private Transform cameraPivot;
@@ -38,24 +44,26 @@ public class RailPlayerMovement : MonoBehaviour
     private bool _jumpRequested;
     private bool canMove = true;
 
-    
     private CharacterController _controller;
     private Vector3 _verticalVelocity;
-    private bool _isTransitioning = false;
-    private Vector3 _targetTransitionPos;
 
     private float _animSpeed;
     private RaycastHit _hit;
+
+    private readonly List<TrackRail.Branch> _branches = new();
+    private float _moveSign = 1f; // +1 avanza en t, -1 retrocede
 
     private void Start()
     {
         _controller = GetComponent<CharacterController>();
         if (animator == null) animator = GetComponent<Animator>();
 
-        
-        if (currentRail != null)
+        if (rail != null)
         {
-            transform.position = currentRail.GetPositionAt(currentT);
+            // Desactivamos el controller un instante para poder teletransportar sin conflictos
+            _controller.enabled = false;
+            transform.position = rail.GetPosition(currentSpline, currentT);
+            _controller.enabled = true;
         }
     }
 
@@ -82,8 +90,7 @@ public class RailPlayerMovement : MonoBehaviour
         jump.action.performed -= OnJump;
         jump.action.canceled -= OnJump;
 
-        interact.action.performed -= OnInteract;
-        interact.action.canceled -= OnInteract;
+        interact.action.started -= OnInteract;
 
         movement.action.Disable();
         jump.action.Disable();
@@ -91,39 +98,23 @@ public class RailPlayerMovement : MonoBehaviour
     }
 
     private bool isTurning;
-    private bool sign = true;
+    private Vector3 _lastFacingDir = Vector3.zero;
+
     public void OnMove(InputAction.CallbackContext context)
     {
-        
         if (!canMove) return;
         _movementInput = context.ReadValue<Vector2>();
-        
-        if (_movementInput.x != 0 && _controller.isGrounded)
-        {
-            bool desiredDirection = Mathf.Sign(_movementInput.x) > 0;
-
-            if (desiredDirection != sign && !isTurning)
-            {
-                StartCoroutine(TurnMesh(desiredDirection));
-            }
-        }
-
     }
 
-    private IEnumerator TurnMesh(bool right)
+    // El root ya rota hacia la dirección real de avance, así que el modelo
+    // NO se gira 180° aparte (eso causaba el doble giro). Solo se dispara la animación.
+    private IEnumerator TurnAnimCooldown()
     {
         isTurning = true;
-
-        animator.SetTrigger("Turn");
-
+        animator?.SetTrigger("Turn");
         yield return new WaitForSeconds(.33f);
-
-        playerModel.transform.localRotation = right ? Quaternion.Euler(0f, 0f, 0f) : Quaternion.Euler(0f, 180f, 0f);
-
-        sign = right;
         isTurning = false;
     }
-    
 
     public void OnJump(InputAction.CallbackContext context)
     {
@@ -136,12 +127,11 @@ public class RailPlayerMovement : MonoBehaviour
 
     public void OnInteract(InputAction.CallbackContext context)
     {
-        
         if (npc != null)
         {
             GameManager.instance.SetNpc(npc);
             SetCanMove(false);
-            
+
             if (GameManager.instance.IsTalking)
             {
                 GameManager.instance.DialogueManager.NextDialogue();
@@ -173,55 +163,95 @@ public class RailPlayerMovement : MonoBehaviour
 
     private void HandleRailMovement()
     {
-        if (currentRail == null) return;
+        if (rail == null) return;
 
-        if (_isTransitioning)
+        bool moved = false;
+        Vector2 input = _movementInput;
+
+        if (input.sqrMagnitude > 0.01f)
         {
-            Vector3 nextPos = Vector3.MoveTowards(transform.position, _targetTransitionPos, switchSpeed * Time.deltaTime);
-            _controller.Move(nextPos - transform.position);
-            RotateTowardsRailForward(currentT);
-            
-            if (Vector3.Distance(transform.position, _targetTransitionPos) < 2f)
+            // 1) Ramas posibles desde la posición actual
+            rail.GetBranchesAt(currentSpline, currentT, _branches);
+
+            Vector3 inputWorld = InputToWorld(input);
+
+            if (inputWorld.sqrMagnitude > 0.0001f)
             {
-                _isTransitioning = false;
+                inputWorld.Normalize();
+
+                // 2) Elegimos la rama que mejor coincide con el input
+                bool found = false;
+                TrackRail.Branch best = default;
+                float bestScore = junctionInputThreshold;
+
+                foreach (var b in _branches)
+                {
+                    float score = Vector3.Dot(b.direction, inputWorld);
+                    if (b.spline == currentSpline) score += currentSplineBias;
+
+                    if (score > bestScore)
+                    {
+                        bestScore = score;
+                        best = b;
+                        found = true;
+                    }
+                }
+
+                // 3) Si no hay rama en esa dirección, el movimiento queda restringido
+                if (found)
+                {
+                    // Cambio de spline sin salto: misma posición, otra spline
+                    if (best.spline != currentSpline)
+                    {
+                        currentSpline = best.spline;
+                        currentT = best.t;
+                    }
+
+                    Vector3 tangent = rail.GetTangent(currentSpline, currentT);
+                    _moveSign = Vector3.Dot(best.direction, tangent) >= 0f ? 1f : -1f;
+
+                    float length = rail.GetLength(currentSpline);
+                    if (length > 0f)
+                    {
+                        float deltaT = (_moveSign * moveSpeed * Time.deltaTime) / length;
+                        float candidateT = Mathf.Clamp01(currentT + deltaT);
+
+                        Vector3 candidatePos = rail.GetPosition(currentSpline, candidateT);
+                        Vector3 move = candidatePos - transform.position;
+                        move.y = 0f;
+
+                        float moveDistance = move.magnitude;
+                        bool blocked = moveDistance > 0.0001f &&
+                                       IsPathBlocked(transform.position, move / moveDistance, moveDistance);
+
+                        if (!blocked)
+                        {
+                            currentT = candidateT;
+                            _controller.Move(move);
+                            moved = moveDistance > 0.0001f;
+                        }
+                    }
+                }
             }
-            return;
         }
 
-        float inputX = _movementInput.x;
-        float candidateT = currentT;
-
-        if (Mathf.Abs(inputX) > 0.01f)
-        {
-            float railLength = currentRail.GetLength();
-            if (railLength > 0f)
-            {
-                float deltaT = (inputX * moveSpeed * Time.deltaTime) / railLength;
-                candidateT = Mathf.Clamp01(currentT + deltaT);
-            }
-        }
-
-        float targetSpeed = Mathf.Abs(inputX) > 0.1f ? 1f : 0f;
+        float targetSpeed = moved ? 1f : 0f;
         _animSpeed = Mathf.MoveTowards(_animSpeed, targetSpeed, 10f * Time.deltaTime);
         animator?.SetFloat("HSpeed", _animSpeed);
 
-        Vector3 candidatePos = currentRail.GetPositionAt(candidateT);
-        Vector3 currentPos = transform.position;
-        Vector3 moveVector = candidatePos - currentPos;
-        moveVector.y = 0f;
-        float moveDistance = moveVector.magnitude;
-
-        if (moveDistance > 0.0001f && IsPathBlocked(currentPos, moveVector.normalized, moveDistance)) return;
-
-        currentT = candidateT;
-
-        Vector3 horizontalMove = candidatePos - transform.position;
-        horizontalMove.y = 0;
-        _controller.Move(horizontalMove);
-
-        RotateTowardsRailForward(currentT);
+        // Solo giramos mientras realmente avanzamos; si no, conservamos la orientación
+        if (moved) RotateTowardsRailForward(currentT);
     }
-    
+
+    // Input 2D -> dirección en mundo (relativa a la cámara, aplanada al plano XZ)
+    private Vector3 InputToWorld(Vector2 input)
+    {
+        Transform cam = playerCamera != null ? playerCamera.transform : transform;
+        Vector3 right = Vector3.ProjectOnPlane(cam.right, Vector3.up).normalized;
+        Vector3 fwd = Vector3.ProjectOnPlane(cam.forward, Vector3.up).normalized;
+        return right * input.x + fwd * input.y;
+    }
+
     private bool IsPathBlocked(Vector3 fromPosition, Vector3 direction, float distance)
     {
         float radius = _controller.radius * obstacleCheckRadiusMultiplier;
@@ -231,23 +261,25 @@ public class RailPlayerMovement : MonoBehaviour
 
         return Physics.CapsuleCast(bottom, top, radius, direction, distance, obstacleLayer);
     }
-    
-    private Vector3 GetRailForwardDirection(float t)
-    {
-        float tBehind = Mathf.Clamp01(t - tangentSampleDelta);
-        float tAhead = Mathf.Clamp01(t + tangentSampleDelta);
-
-        return currentRail.GetPositionAt(tAhead) - currentRail.GetPositionAt(tBehind);
-    }
 
     private float rotationSpeed = 720f;
-    private float tangentSampleDelta = 0.01f;
-    
+
     private void RotateTowardsRailForward(float t)
     {
-        Vector3 forward = GetRailForwardDirection(t);
+        // Dirección real de avance = tangente firmada según el sentido en que nos movemos
+        Vector3 forward = rail.GetTangent(currentSpline, t) * _moveSign;
         forward.y = 0f;
         if (forward.sqrMagnitude < 0.0001f) return;
+        forward.Normalize();
+
+        // Inversión de sentido -> animación de giro
+        if (_lastFacingDir != Vector3.zero &&
+            Vector3.Dot(_lastFacingDir, forward) < -0.5f &&
+            _controller.isGrounded && !isTurning)
+        {
+            StartCoroutine(TurnAnimCooldown());
+        }
+        _lastFacingDir = forward;
 
         Quaternion targetRotation = Quaternion.LookRotation(forward, Vector3.up);
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
@@ -284,16 +316,6 @@ public class RailPlayerMovement : MonoBehaviour
         if (HudManager.Instance == null || HudManager.Instance.IsTarget) return;
 
         Physics.SphereCast(transform.position, 2f, Vector3.one, out _hit, 5f);
-    }
-
-    public void SwitchToRail(TrackRail newRail, float newT)
-    {
-        if (newRail == null || newRail == currentRail) return;
-
-        currentRail = newRail;
-        currentT = newT;
-        _targetTransitionPos = currentRail.GetPositionAt(currentT);
-        _isTransitioning = true;
     }
 
     private NPCDialogue npc;

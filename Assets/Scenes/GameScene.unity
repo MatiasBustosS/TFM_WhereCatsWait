@@ -18259,7 +18259,7 @@ RectTransform:
   m_GameObject: {fileID: 1630250660}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1887206437}
@@ -18291,7 +18291,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: 7cf83ef718fdc4d43b0756d92dc8baf1, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -23798,7 +23798,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   PressE: {fileID: 649085159}
   characterName: Aiko
-  characterFace: {fileID: 21300000, guid: 5d837b30666930a4a9313913df8dbd51, type: 3}
+  characterFace: {fileID: 21300000, guid: f92d713b50b886f42970a735c5fdc024, type: 3}
   voice: {fileID: 8300000, guid: 2cac9f4d1fd531b4f8023347c763a8f1, type: 3}
   dialogues:
   - dialogue:
