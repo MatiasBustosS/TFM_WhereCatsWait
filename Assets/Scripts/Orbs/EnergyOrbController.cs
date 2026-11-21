@@ -17,25 +17,23 @@ public class EnergyOrbController : MonoBehaviour
     [Header("Referencias Visuales")]
     [SerializeField] private MeshRenderer orbMeshRenderer;
     [SerializeField] private GameObject orbParticles;
+    [SerializeField] private EnergyOrbVfxController orbVfxController;
 
     [Header("Configuración por Estado")]
     [Header("Estado 1: Vacío")]
-    [SerializeField] private Color emptyColor = new Color(1f, 1f, 1f, 0.2f);
-    [SerializeField] private float emptyScale = 0.5f;
-
-    [Header("Estado 2: Recolectando")]
-    [SerializeField] private Color collectingColor = new Color(1f, 0.9f, 0.2f, 0.8f);
-    [SerializeField] private float baseCollectingScale = 0.6f;
-    [SerializeField] private float scalePerEnergy = 0.05f;
-    [SerializeField] private float maxCollectingScale = 1.8f;
+    [SerializeField] private Color emptyColor = new Color(0.82f, 0.93f, 1f, 1f);
+    [SerializeField] private float emptyScale = 0.12f;
 
     [Header("Estado 3: Energía Máxima")]
-    [SerializeField] private Color maxEnergyColor = new Color(0f, 0.5f, 1f, 1f);
+    [SerializeField] private Color maxEnergyColor = new Color(0.06f, 0.2f, 0.5f, 1f);
     [SerializeField] private float maxEnergyScale = 2.2f;
 
     private OrbState _currentState = OrbState.Empty;
     private int _collectedCount = 0;
     private Material _orbMaterial;
+    private float EnergyProgress => orbs == null || orbs.Length == 0
+        ? 0f
+        : Mathf.Clamp01((float)_collectedCount / orbs.Length);
 
     private static readonly int ColorProperty = Shader.PropertyToID("_ShallowColor");
     private static readonly int EmissionColorProperty = Shader.PropertyToID("_EmissionColor");
@@ -45,6 +43,11 @@ public class EnergyOrbController : MonoBehaviour
         if (orbMeshRenderer != null)
         {
             _orbMaterial = orbMeshRenderer.material;
+        }
+
+        if (orbVfxController == null)
+        {
+            orbVfxController = GetComponent<EnergyOrbVfxController>();
         }
 
         UpdateOrbVisuals();
@@ -121,28 +124,13 @@ public class EnergyOrbController : MonoBehaviour
 
     private void UpdateOrbVisuals()
     {
-        Color targetColor = Color.white;
-        float targetScale = 1f;
+        float energyProgress = EnergyProgress;
+        Color targetColor = Color.Lerp(emptyColor, maxEnergyColor, energyProgress);
+        float targetScale = Mathf.Lerp(emptyScale, maxEnergyScale, energyProgress);
 
-        switch (_currentState)
+        if (orbParticles != null)
         {
-            case OrbState.Empty:
-                targetColor = emptyColor;
-                targetScale = emptyScale;
-                orbParticles.SetActive(false);
-                break;
-
-            case OrbState.Collecting:
-                targetColor = collectingColor;
-                targetScale = Mathf.Min(baseCollectingScale + (_collectedCount * scalePerEnergy), maxCollectingScale);
-                orbParticles.SetActive(false);
-                break;
-
-            case OrbState.MaxEnergy:
-                targetColor = maxEnergyColor;
-                targetScale = maxEnergyScale;
-                orbParticles.SetActive(true);
-                break;
+            orbParticles.SetActive(true);
         }
 
         transform.localScale = Vector3.one * targetScale;
@@ -154,9 +142,15 @@ public class EnergyOrbController : MonoBehaviour
 
             if (_orbMaterial.HasProperty(EmissionColorProperty))
             {
-                float intensity = (_currentState == OrbState.MaxEnergy) ? 4f : 2f;
+                float intensity = Mathf.Lerp(1f, 1.5f, energyProgress);
                 _orbMaterial.SetColor(EmissionColorProperty, targetColor * intensity);
             }
+        }
+
+        if (orbVfxController != null)
+        {
+            float orbDiameter = orbMeshRenderer != null ? orbMeshRenderer.bounds.size.x : targetScale;
+            orbVfxController.SetOrbVisuals(targetColor, orbDiameter, energyProgress);
         }
     }
 }

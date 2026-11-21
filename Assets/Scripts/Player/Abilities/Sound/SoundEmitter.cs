@@ -9,6 +9,7 @@ public class SoundEmitter : MonoBehaviour
 
     [SerializeField] private AudioSource audioSource;
     private EnergyCollectable energyCollectable;
+    public bool CanEmitSound => energyCollectable != null && energyCollectable.IsSound;
 
     private void Start()
     {

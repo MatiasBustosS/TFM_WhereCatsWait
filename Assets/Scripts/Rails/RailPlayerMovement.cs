@@ -35,6 +35,7 @@ public class RailPlayerMovement : MonoBehaviour
     [Header("Visual & Interaction")]
     [SerializeField] private Transform cameraPivot;
     [SerializeField] private Camera playerCamera;
+    [SerializeField] private CameraMovement2 cameraMovement;
     [SerializeField] private Animator animator;
     [SerializeField] private GameObject playerModel;
 
@@ -52,11 +53,22 @@ public class RailPlayerMovement : MonoBehaviour
 
     private readonly List<TrackRail.Branch> _branches = new();
     private float _moveSign = 1f; // +1 avanza en t, -1 retrocede
+    private bool _cameraFacingRight = true;
+    private int _lastCameraHorizontalInput;
 
     private void Start()
     {
         _controller = GetComponent<CharacterController>();
         if (animator == null) animator = GetComponent<Animator>();
+        if (cameraMovement == null)
+        {
+            cameraMovement = FindFirstObjectByType<CameraMovement2>();
+        }
+
+        if (cameraMovement == null)
+        {
+            Debug.LogWarning("No CameraMovement2 was found; the camera will not respond to horizontal input.", this);
+        }
 
         if (rail != null)
         {
@@ -104,6 +116,22 @@ public class RailPlayerMovement : MonoBehaviour
     {
         if (!canMove) return;
         _movementInput = context.ReadValue<Vector2>();
+        int horizontalInput = Mathf.Abs(_movementInput.x) > 0.1f
+            ? (_movementInput.x > 0f ? 1 : -1)
+            : 0;
+
+        if (horizontalInput == 0)
+        {
+            _lastCameraHorizontalInput = 0;
+            return;
+        }
+
+        if (horizontalInput == _lastCameraHorizontalInput)
+            return;
+
+        _lastCameraHorizontalInput = horizontalInput;
+        _cameraFacingRight = horizontalInput > 0;
+        cameraMovement?.SetPlayerFacing(_cameraFacingRight, 0.33f);
     }
 
     // El root ya rota hacia la dirección real de avance, así que el modelo
@@ -272,13 +300,17 @@ public class RailPlayerMovement : MonoBehaviour
         if (forward.sqrMagnitude < 0.0001f) return;
         forward.Normalize();
 
-        // Inversión de sentido -> animación de giro
-        if (_lastFacingDir != Vector3.zero &&
-            Vector3.Dot(_lastFacingDir, forward) < -0.5f &&
-            _controller.isGrounded && !isTurning)
+        bool reversedDirection = _lastFacingDir != Vector3.zero &&
+            Vector3.Dot(_lastFacingDir, forward) < -0.5f;
+
+        if (reversedDirection)
         {
-            StartCoroutine(TurnAnimCooldown());
+            if (_controller.isGrounded && !isTurning)
+            {
+                StartCoroutine(TurnAnimCooldown());
+            }
         }
+
         _lastFacingDir = forward;
 
         Quaternion targetRotation = Quaternion.LookRotation(forward, Vector3.up);
@@ -332,6 +364,7 @@ public class RailPlayerMovement : MonoBehaviour
         {
             animator?.SetFloat("HSpeed", 0f);
             _movementInput = Vector2.zero;
+            _lastCameraHorizontalInput = 0;
         }
     }
 
