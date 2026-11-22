@@ -16347,8 +16347,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SoundIndicatorManager
   playerCamera: {fileID: 80323105}
+  indicatorOrigin: {fileID: 2023905596}
   indicatorContainer: {fileID: 836427170}
   indicatorPrefab: {fileID: 2670463371461053748, guid: e0d5b06fb6126d44793406f0c179baa6, type: 3}
+  noDirectionSprite: {fileID: 21300000, guid: 9c9bcf4b096cad640bd2601dcdccbdb3, type: 3}
+  noDirectionColor: {r: 1, g: 0, b: 0, a: 1}
   indicatorRadius: 100
   indicatorDuration: 4
   maxSoundDistance: 30
@@ -16743,7 +16746,7 @@ MonoBehaviour:
   cameraMovement: {fileID: 156830402}
   useAbility: {fileID: 1120369429361536294, guid: 3d84e742333210a4d825ee61bb898214, type: 3}
   changeAbility: {fileID: 334581185042427365, guid: 3d84e742333210a4d825ee61bb898214, type: 3}
-  hearingRange: 20
+  hearingRange: 30
   abilityCooldown: 5
   YuiShader: {fileID: 2023905601}
   particle: {fileID: 196567573}

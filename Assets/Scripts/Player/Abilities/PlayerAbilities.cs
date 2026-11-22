@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -8,7 +9,7 @@ public class PlayerAbilities : MonoBehaviour
     [SerializeField] private InputActionReference useAbility;
     [SerializeField] private InputActionReference changeAbility;
     
-    [SerializeField] private float hearingRange = 20f;
+    [SerializeField] private float hearingRange = 30f;
     [SerializeField] private float abilityCooldown = 5f;
     [SerializeField] private ShaderPosition YuiShader;
     [SerializeField] private ParticleSystem particle;
@@ -303,22 +304,24 @@ public class PlayerAbilities : MonoBehaviour
 
     private void UseCatHearing()
     {
-        SoundEmitter[] emitters = FindObjectsByType<SoundEmitter>(
-            FindObjectsInactive.Exclude,
-            FindObjectsSortMode.None);
+        if (hearingRange < 0f)
+        {
+            Debug.LogError("PlayerAbilities hearing range cannot be negative.", this);
+            return;
+        }
+
+        IReadOnlyList<SoundEmitter> emitters = SoundEmitter.ActiveEmitters;
+        float hearingRangeSquared = hearingRange * hearingRange;
         bool foundAudibleEmitter = false;
 
-        foreach (SoundEmitter emitter in emitters)
+        for (int i = 0; i < emitters.Count; i++)
         {
+            SoundEmitter emitter = emitters[i];
             if (emitter == null || !emitter.CanEmitSound)
                 continue;
 
-            float distance = Vector3.Distance(
-                transform.position,
-                emitter.transform.position
-            );
-
-            if (distance > hearingRange)
+            Vector3 offset = emitter.transform.position - transform.position;
+            if (offset.sqrMagnitude > hearingRangeSquared)
                 continue;
 
             emitter.EmitSound();
@@ -326,7 +329,14 @@ public class PlayerAbilities : MonoBehaviour
         }
 
         if (!foundAudibleEmitter)
+        {
+            if (SoundIndicatorManager.Instance != null)
+                SoundIndicatorManager.Instance.ShowHearingPulse();
+            else
+                Debug.LogError("PlayerAbilities requires a SoundIndicatorManager to show hearing feedback.", this);
+
             Debug.LogWarning($"Cat hearing found no active sound emitters within {hearingRange} units.", this);
+        }
     }
     
     private IEnumerator AbilityCooldown()

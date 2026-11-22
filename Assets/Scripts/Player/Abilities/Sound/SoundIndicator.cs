@@ -9,6 +9,8 @@ public class SoundIndicator : MonoBehaviour
 
     public Vector3 WorldPosition { get; private set; }
 
+    public bool HasDirection { get; private set; }
+
     public bool IsFinished => currentTime <= 0f;
 
     private float currentTime;
@@ -25,9 +27,17 @@ public class SoundIndicator : MonoBehaviour
         if (iconImage != null) originalColor = iconImage.color;
     }
 
-    public void Initialize(Vector3 worldPosition, float duration, Sprite icon = null)
+    public void Initialize(
+        Vector3 worldPosition,
+        float duration,
+        Sprite icon = null,
+        bool hasDirection = true,
+        float initialRotation = 0f,
+        Color? tint = null)
     {
         WorldPosition = worldPosition;
+        HasDirection = hasDirection;
+        RectTransform.localRotation = Quaternion.Euler(0f, 0f, initialRotation);
 
         totalDuration = duration;
         currentTime = duration;
@@ -35,6 +45,7 @@ public class SoundIndicator : MonoBehaviour
         if (iconImage != null)
         {
             if (icon != null) iconImage.sprite = icon;
+            if (tint.HasValue) iconImage.color = tint.Value;
 
             originalColor = iconImage.color;
         }
