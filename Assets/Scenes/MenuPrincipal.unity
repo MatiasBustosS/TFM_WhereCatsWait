@@ -1922,7 +1922,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91615bb32eac4f94d9265a4b6ec1e0a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuPrincipalManager
-  nombreNivel: SampleScene
+  nombreNivel: GameScene 2
 --- !u!224 &1032811236
 RectTransform:
   m_ObjectHideFlags: 0
